@@ -6,11 +6,8 @@ const Update: NextPage = (props) => {
   return (
     <div>
       <Head>
-        <title>Solana Scaffold</title>
-        <meta
-          name="description"
-          content="Solana Scaffold"
-        />
+        <title>SPL Token Creator</title>
+        <meta name="description" content="SPL Token Creator" />
       </Head>
       <UpdateView />
     </div>

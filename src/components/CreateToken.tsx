@@ -21,6 +21,7 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import { MdOutlineAddAPhoto } from "react-icons/md";
 import { FaLink, FaXmark } from "react-icons/fa6";
+import { notify } from "utils/notifications";
 
 export const CreateToken: FC = () => {
   const { connection } = useConnection();
@@ -194,6 +195,14 @@ export const CreateToken: FC = () => {
     );
     await sendTransaction(createNewTokenTransaction, connection, {
       signers: [mintKeypair],
+    }).then((res) => {
+      console.log("RESPONSE:", res);
+      notify({
+        type: "success",
+        message: "Your token has been created successfully!",
+        description: "Check your wallet to access your token",
+        txid: res,
+      });
     });
   }, [publicKey, connection, sendTransaction]);
 

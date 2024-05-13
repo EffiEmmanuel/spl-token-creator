@@ -19,18 +19,6 @@ export const AppBar: FC = (props) => {
 
         {/* Wallet & Settings */}
         <div className="navbar-end">
-          <Link href="/">
-            <a className="mr-8 text-xs">Token Creator</a>
-          </Link>
-          <Link href="/update">
-            <a className="mr-4 text-xs">Update Metadata</a>
-          </Link>
-          <Link href="/uploader">
-            <a className="mr-8 text-xs">Upload Metadata</a>
-          </Link>
-          <Link href="/metadata">
-            <a className="mr-4 text-xs">Token Metadata</a>
-          </Link>
           <div className="dropdown">
             <div tabIndex={0} className="btn btn-square btn-ghost text-right">
               <svg
