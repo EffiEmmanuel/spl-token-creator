@@ -75,136 +75,148 @@ export const CreateToken: FC = () => {
     return response;
   }
 
-  const handleCreateToken = useCallback(async () => {
-    if (!image) {
-      console.log("IMAGE:", image);
-      alert("You must select an image");
-      return;
-    }
-    const uploadImageResponse = await uploadFile(
-      image,
-      "image",
-      "token-creator"
-    );
-    const uploadImageData = await uploadImageResponse.json();
-    console.log("UPLOAD IMAGE DATA FROM CLOUDINARY:", uploadImageData);
-    if (!uploadImageData?.secure_url) {
-      alert("An error occured while uploading your image. Please try again.");
-      return;
-    }
-    // Create json file for metadata
-    const metadataJSON = JSON.stringify({
-      name: tokenName,
-      symbol,
-      description,
-      image: uploadImageData?.secure_url,
-    });
-
-    // Step 2: Convert JSON data to a Blob
-    const blob = new Blob([metadataJSON], { type: "application/json" });
-    console.log("OVER HERE 1");
-
-    // Step 3: Create a File object from the Blob
-    const file = new File([blob], `${tokenName}-${Date.now()}-${symbol}.json`, {
-      type: "application/json",
-    });
-
-    console.log("OVER HERE 2");
-
-    // Upload it to cloudinary
-    const uploadMetadataResponse = await uploadFile(file, "raw", "token-json");
-    console.log("OVER HERE 3");
-
-    const uploadMetadataData = await uploadMetadataResponse.json();
-    console.log("OVER HERE 4:", uploadMetadataData?.secure_url);
-
-    if (!uploadMetadataData?.secure_url) {
-      alert(
-        "An error occured while uploading your token's metadata. Please try again."
-      );
-      return;
-    }
-
-    const lamports = await getMinimumBalanceForRentExemptMint(connection);
-    const mintKeypair = Keypair.generate();
-    const tokenATA = await getAssociatedTokenAddress(
-      mintKeypair.publicKey,
-      publicKey
-    );
-
-    const createMetadataInstruction = createCreateMetadataAccountV3Instruction(
-      {
-        metadata: PublicKey.findProgramAddressSync(
-          [
-            Buffer.from("metadata"),
-            PROGRAM_ID.toBuffer(),
-            mintKeypair.publicKey.toBuffer(),
-          ],
-          PROGRAM_ID
-        )[0],
-        mint: mintKeypair.publicKey,
-        mintAuthority: publicKey,
-        payer: publicKey,
-        updateAuthority: publicKey,
-      },
-      {
-        createMetadataAccountArgsV3: {
-          data: {
-            name: tokenName,
-            symbol: symbol,
-            uri: uploadMetadataData?.secure_url,
-            creators: null,
-            sellerFeeBasisPoints: 0,
-            uses: null,
-            collection: null,
-          },
-          isMutable: false,
-          collectionDetails: null,
-        },
+  const handleCreateToken = useCallback(
+    async (tokenImage) => {
+      if (!tokenImage) {
+        console.log("IMAGE:", tokenImage);
+        alert("You must select an image");
+        return;
       }
-    );
-
-    const createNewTokenTransaction = new Transaction().add(
-      SystemProgram.createAccount({
-        fromPubkey: publicKey,
-        newAccountPubkey: mintKeypair.publicKey,
-        space: MINT_SIZE,
-        lamports: lamports,
-        programId: TOKEN_PROGRAM_ID,
-      }),
-      createInitializeMintInstruction(
-        mintKeypair.publicKey,
-        +decimals,
-        publicKey,
-        publicKey,
-        TOKEN_PROGRAM_ID
-      ),
-      createAssociatedTokenAccountInstruction(
-        publicKey,
-        tokenATA,
-        publicKey,
-        mintKeypair.publicKey
-      ),
-      createMintToInstruction(
-        mintKeypair.publicKey,
-        tokenATA,
-        publicKey,
-        +amount * Math.pow(10, +decimals)
-      ),
-      createMetadataInstruction
-    );
-    await sendTransaction(createNewTokenTransaction, connection, {
-      signers: [mintKeypair],
-    }).then((res) => {
-      console.log("RESPONSE:", res);
-      notify({
-        type: "success",
-        message: "Your token has been created successfully!",
-        description: "Check your wallet to access your token",
-        txid: res,
+      const uploadImageResponse = await uploadFile(
+        tokenImage,
+        "image",
+        "token-creator"
+      );
+      const uploadImageData = await uploadImageResponse.json();
+      console.log("UPLOAD IMAGE DATA FROM CLOUDINARY:", uploadImageData);
+      if (!uploadImageData?.secure_url) {
+        alert("An error occured while uploading your image. Please try again.");
+        return;
+      }
+      // Create json file for metadata
+      const metadataJSON = JSON.stringify({
+        name: tokenName,
+        symbol,
+        description,
+        image: uploadImageData?.secure_url,
       });
-    });
-  }, [publicKey, connection, sendTransaction]);
+
+      // Step 2: Convert JSON data to a Blob
+      const blob = new Blob([metadataJSON], { type: "application/json" });
+      console.log("OVER HERE 1");
+
+      // Step 3: Create a File object from the Blob
+      const file = new File(
+        [blob],
+        `${tokenName}-${Date.now()}-${symbol}.json`,
+        {
+          type: "application/json",
+        }
+      );
+
+      console.log("OVER HERE 2");
+
+      // Upload it to cloudinary
+      const uploadMetadataResponse = await uploadFile(
+        file,
+        "raw",
+        "token-json"
+      );
+      console.log("OVER HERE 3");
+
+      const uploadMetadataData = await uploadMetadataResponse.json();
+      console.log("OVER HERE 4:", uploadMetadataData?.secure_url);
+
+      if (!uploadMetadataData?.secure_url) {
+        alert(
+          "An error occured while uploading your token's metadata. Please try again."
+        );
+        return;
+      }
+
+      const lamports = await getMinimumBalanceForRentExemptMint(connection);
+      const mintKeypair = Keypair.generate();
+      const tokenATA = await getAssociatedTokenAddress(
+        mintKeypair.publicKey,
+        publicKey
+      );
+
+      const createMetadataInstruction =
+        createCreateMetadataAccountV3Instruction(
+          {
+            metadata: PublicKey.findProgramAddressSync(
+              [
+                Buffer.from("metadata"),
+                PROGRAM_ID.toBuffer(),
+                mintKeypair.publicKey.toBuffer(),
+              ],
+              PROGRAM_ID
+            )[0],
+            mint: mintKeypair.publicKey,
+            mintAuthority: publicKey,
+            payer: publicKey,
+            updateAuthority: publicKey,
+          },
+          {
+            createMetadataAccountArgsV3: {
+              data: {
+                name: tokenName,
+                symbol: symbol,
+                uri: uploadMetadataData?.secure_url,
+                creators: null,
+                sellerFeeBasisPoints: 0,
+                uses: null,
+                collection: null,
+              },
+              isMutable: false,
+              collectionDetails: null,
+            },
+          }
+        );
+
+      const createNewTokenTransaction = new Transaction().add(
+        SystemProgram.createAccount({
+          fromPubkey: publicKey,
+          newAccountPubkey: mintKeypair.publicKey,
+          space: MINT_SIZE,
+          lamports: lamports,
+          programId: TOKEN_PROGRAM_ID,
+        }),
+        createInitializeMintInstruction(
+          mintKeypair.publicKey,
+          +decimals,
+          publicKey,
+          publicKey,
+          TOKEN_PROGRAM_ID
+        ),
+        createAssociatedTokenAccountInstruction(
+          publicKey,
+          tokenATA,
+          publicKey,
+          mintKeypair.publicKey
+        ),
+        createMintToInstruction(
+          mintKeypair.publicKey,
+          tokenATA,
+          publicKey,
+          +amount * Math.pow(10, +decimals)
+        ),
+        createMetadataInstruction
+      );
+      await sendTransaction(createNewTokenTransaction, connection, {
+        signers: [mintKeypair],
+      }).then((res) => {
+        console.log("RESPONSE:", res);
+        notify({
+          type: "success",
+          message: "Your token has been created successfully!",
+          description: "Check your wallet to access your token",
+          txid: res,
+        });
+      });
+    },
+    [publicKey, connection, sendTransaction]
+  );
 
   return (
     <>
@@ -377,7 +389,7 @@ export const CreateToken: FC = () => {
                       <button
                         onClick={(e) => {
                           e.preventDefault();
-                          handleCreateToken();
+                          handleCreateToken(image);
                         }}
                         className="rounded-full h-14 w-full bg-[#43437D]"
                       >
