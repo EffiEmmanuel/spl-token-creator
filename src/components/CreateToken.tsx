@@ -76,7 +76,7 @@ export const CreateToken: FC = () => {
   }
 
   const handleCreateToken = useCallback(
-    async (tokenImage, name, sym, desc) => {
+    async (tokenImage, name, sym, desc, mintDecimals, tokenAmount) => {
       if (!tokenImage) {
         console.log("IMAGE:", tokenImage);
         alert("You must select an image");
@@ -183,7 +183,7 @@ export const CreateToken: FC = () => {
         }),
         createInitializeMintInstruction(
           mintKeypair.publicKey,
-          +decimals,
+          +mintDecimals,
           publicKey,
           publicKey,
           TOKEN_PROGRAM_ID
@@ -198,7 +198,7 @@ export const CreateToken: FC = () => {
           mintKeypair.publicKey,
           tokenATA,
           publicKey,
-          +amount * Math.pow(10, +decimals)
+          +tokenAmount * Math.pow(10, +decimals)
         ),
         createMetadataInstruction
       );
@@ -392,7 +392,9 @@ export const CreateToken: FC = () => {
                             image,
                             tokenName,
                             symbol,
-                            description
+                            description,
+                            decimals,
+                            amount
                           );
                         }}
                         className="rounded-full h-14 w-full bg-[#43437D]"
