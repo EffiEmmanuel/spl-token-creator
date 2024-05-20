@@ -76,7 +76,7 @@ export const CreateToken: FC = () => {
   }
 
   const handleCreateToken = useCallback(
-    async (tokenImage) => {
+    async (tokenImage, name, sym, desc) => {
       if (!tokenImage) {
         console.log("IMAGE:", tokenImage);
         alert("You must select an image");
@@ -95,9 +95,9 @@ export const CreateToken: FC = () => {
       }
       // Create json file for metadata
       const metadataJSON = JSON.stringify({
-        name: tokenName,
-        symbol,
-        description,
+        name: name,
+        symbol: sym,
+        description: desc,
         image: uploadImageData?.secure_url,
       });
 
@@ -389,7 +389,12 @@ export const CreateToken: FC = () => {
                       <button
                         onClick={(e) => {
                           e.preventDefault();
-                          handleCreateToken(image);
+                          handleCreateToken(
+                            image,
+                            tokenName,
+                            symbol,
+                            description
+                          );
                         }}
                         className="rounded-full h-14 w-full bg-[#43437D]"
                       >
