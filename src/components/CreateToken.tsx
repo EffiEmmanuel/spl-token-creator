@@ -469,6 +469,7 @@ export const CreateToken: FC = () => {
                     <a
                       className="text-blue-600 flex flex-row gap-x-1 items-center"
                       target="_blank"
+                      rel="noreferrer"
                       href="https://solscan.io/address/TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
                     >
                       <span>Token Program</span>
