@@ -160,8 +160,8 @@ export const CreateToken: FC = () => {
           {
             createMetadataAccountArgsV3: {
               data: {
-                name: tokenName,
-                symbol: symbol,
+                name: name,
+                symbol: sym,
                 uri: uploadMetadataData?.secure_url,
                 creators: null,
                 sellerFeeBasisPoints: 0,
