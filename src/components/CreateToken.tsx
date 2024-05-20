@@ -126,7 +126,6 @@ export const CreateToken: FC = () => {
 
       const uploadMetadataData = await uploadMetadataResponse.json();
       console.log("OVER HERE 4:", uploadMetadataData?.secure_url);
-
       if (!uploadMetadataData?.secure_url) {
         alert(
           "An error occured while uploading your token's metadata. Please try again."
